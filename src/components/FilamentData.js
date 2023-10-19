@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ColorSample from "./ColorSample"; // Import the ColorSample component
+import ColorSample from "./ColorSample";
 
 const FilamentData = () => {
 	const [data, setData] = useState(null);
@@ -17,34 +17,31 @@ const FilamentData = () => {
 					throw new Error("Network response was not ok");
 				}
 
-				const data = await response.json();
-				setData(data);
-				setLoading(false); // Data is loaded
-			} catch (error) {
-				console.error("Error fetching data:", error);
+				const fetchedData = await response.json();
+				setData(fetchedData);
+				setLoading(false);
+			} catch (err) {
+				console.error("Error fetching data:", err);
 				setError("Failed to fetch data");
-				setLoading(false); // Error occurred, loading is done
+				setLoading(false);
 			}
 		};
 
-		// Fetch data initially and set up a timer to fetch data periodically
-		fetchData();
-		const intervalId = setInterval(fetchData, 60000); // Fetch data every minute
+		const intervalId = setInterval(fetchData, 60000);
+		fetchData(); // Initial fetch
 
 		return () => {
-			// Cleanup: clear the interval when the component unmounts
 			clearInterval(intervalId);
 		};
 	}, []);
 
-	return (
-		<div className="container mt-5">
-			<h1>Filament Data</h1>
-			{loading ? (
-				<p>Loading data...</p>
-			) : error ? (
-				<p>Error: {error}</p>
-			) : (
+	const renderContent = () => {
+		if (loading) {
+			return <p>Loading data...</p>;
+		} else if (error) {
+			return <p>Error: {error}</p>;
+		} else if (data) {
+			return (
 				<div>
 					<p>Type: {data[0].name}</p>
 					<p>Description: {data[0].description}</p>
@@ -59,7 +56,14 @@ const FilamentData = () => {
 					</p>
 					<p>Diameter Sizes: {data[0].diameter_sizes.join(", ")}</p>
 				</div>
-			)}
+			);
+		}
+	};
+
+	return (
+		<div className="container mt-5">
+			<h1>Filament Data</h1>
+			{renderContent()}
 		</div>
 	);
 };
