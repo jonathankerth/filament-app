@@ -3,6 +3,8 @@ import ColorSample from "./ColorSample"; // Import the ColorSample component
 
 const FilamentData = () => {
 	const [data, setData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -17,9 +19,11 @@ const FilamentData = () => {
 
 				const data = await response.json();
 				setData(data);
+				setLoading(false); // Data is loaded
 			} catch (error) {
 				console.error("Error fetching data:", error);
-				setData({ error: "Failed to fetch data" });
+				setError("Failed to fetch data");
+				setLoading(false); // Error occurred, loading is done
 			}
 		};
 
@@ -36,9 +40,13 @@ const FilamentData = () => {
 	return (
 		<div className="container mt-5">
 			<h1>Filament Data</h1>
-			{data ? (
+			{loading ? (
+				<p>Loading data...</p>
+			) : error ? (
+				<p>Error: {error}</p>
+			) : (
 				<div>
-					<p>Name: {data[0].name}</p>
+					<p>Type: {data[0].name}</p>
 					<p>Description: {data[0].description}</p>
 					<p>
 						Colors:{" "}
@@ -50,10 +58,7 @@ const FilamentData = () => {
 						))}
 					</p>
 					<p>Diameter Sizes: {data[0].diameter_sizes.join(", ")}</p>
-					<p>Net Weight: {data[0].net_weight}</p>
 				</div>
-			) : (
-				<p>Loading data...</p>
 			)}
 		</div>
 	);
